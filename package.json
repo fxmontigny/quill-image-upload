@@ -1,6 +1,6 @@
 {
   "name": "quill-image-upload",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A module for Quill rich text editor to upload images to be selected from toolbar editor.",
   "main": "index.js",
   "scripts": {
