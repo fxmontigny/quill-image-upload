@@ -1,0 +1,35 @@
+{
+  "name": "quill-image-upload",
+  "version": "0.1.0",
+  "description": "A module for Quill rich text editor to upload images to be selected from toolbar editor.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "sh ./bin/release.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fxmontigny/quill-image-upload.git"
+  },
+  "keywords": [
+    "quill",
+    "quilljs",
+    "image",
+    "upload"
+  ],
+  "author": "@fxmontigny",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fxmontigny/quill-image-upload/issues"
+  },
+  "homepage": "https://github.com/fxmontigny/quill-image-upload#readme",
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-preset-env": "^1.2.2",
+    "babel-preset-es2015": "^6.24.0",
+    "uglify-js": "^2.8.13"
+  },
+  "dependencies": {
+    "quill": "^1.2.2"
+  }
+}

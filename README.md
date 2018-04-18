@@ -1,0 +1,64 @@
+# Quill ImageUpload Module
+
+A module for Quill rich text editor to upload images to be selected from toolbar editor.
+
+## Usage
+
+### Webpack/ES6
+
+```javascript
+import Quill from 'quill';
+import { ImageUpload } from 'quill-image-upload';
+
+Quill.register('modules/imageUpload', ImageUpload);
+
+const quill = new Quill(editor, {
+    // ...
+    modules: {
+        // ...
+        imageUpload: {
+            url: "", // server url
+            method: "POST", // change query method, default 'POST' 
+            headers: {}, // add custom headers, example { token: 'your-token'}
+            // personalize successful callback and call next function to insert new url to the editor
+            callbackOK: (serverResponse, next) => {
+                next(serverResponse);   
+            },
+            // personalize failed callback
+            callbackKO: (serverError) => {
+                alert(serverError);
+            }
+        }
+    }
+});
+```
+
+### Script Tag
+
+Copy image-upload.min.js into your web root or include from node_modules
+
+```html
+<script src="/node_modules/quill-image-upload/image-upload.min.js"></script>
+```
+
+```javascript
+var quill = new Quill(editor, {
+    // ...
+    modules: {
+        // ...
+        imageUpload: {
+            url: "", // server url
+            method: "POST", // change query method, default 'POST' 
+            headers: {}, // add custom headers, example { token: 'your-token'}
+            // personalize successful callback and call next function to insert new url to the editor
+            callbackOK: (serverResponse, next) => {
+                next(serverResponse);   
+            },
+            // personalize failed callback
+            callbackKO: (serverError) => {
+                alert(serverError);
+            }
+        }
+    }
+});
+```
