@@ -34,8 +34,8 @@ export class ImageUpload {
 
 			// file type is only image.
 			if (/^image\//.test(file.type)) {
-				const checkBeforeSend = this.options.checkBeforeSend || this.checkBeforeSend;
-				checkBeforeSend(file, this.sendToServer);
+				const checkBeforeSend = this.options.checkBeforeSend || this.checkBeforeSend.bind(this);
+				checkBeforeSend(file, this.sendToServer.bind(this));
 			} else {
 				console.warn('You could only upload images.');
 			}
