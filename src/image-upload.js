@@ -34,11 +34,21 @@ export class ImageUpload {
 
 			// file type is only image.
 			if (/^image\//.test(file.type)) {
-				this.sendToServer(file);
+				const checkBeforeSend = this.options.checkBeforeSend || this.checkBeforeSend;
+				checkBeforeSend(file, this.sendToServer);
 			} else {
 				console.warn('You could only upload images.');
 			}
 		};
+	}
+
+	/**
+	 * Check file before sending to the server
+	 * @param {File} file 
+	 * @param {Function} next 
+	 */
+	checkBeforeSend(file, next) {
+		next(file);
 	}
 
 	/**
