@@ -93,7 +93,8 @@ export class ImageUpload {
 	 * @param {String} dataUrl  The base64-encoded image URI
 	 */
 	insert(dataUrl) {
-		const index = (this.quill.getSelection() || {}).index || this.quill.getLength();
+		const selection = this.quill.getSelection();
+    		const index = selection ? selection.index : this.quill.getLength();
 		this.quill.insertEmbed(index, 'image', dataUrl, 'user');
 	}
 
