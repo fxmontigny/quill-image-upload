@@ -44,8 +44,8 @@ export class ImageUpload {
 
 	/**
 	 * Check file before sending to the server
-	 * @param {File} file 
-	 * @param {Function} next 
+     * @param {File} file
+     * @param {Function} next
 	 */
 	checkBeforeSend(file, next) {
 		next(file);
@@ -58,11 +58,12 @@ export class ImageUpload {
 	sendToServer(file) {
 		const url = this.options.url || 'your-url.com',
 			method = this.options.method || 'POST',
+            name = this.options.name || 'image',
 			headers = this.options.headers || {},
 			callbackOK = this.options.callbackOK || this.uploadImageCallbackOK.bind(this),
 			callbackKO = this.options.callbackKO || this.uploadImageCallbackKO.bind(this),
 			fd = new FormData();
-		fd.append('image', file);
+		fd.append(name, file);
 
 		const xhr = new XMLHttpRequest();
 		// init http query
@@ -84,6 +85,10 @@ export class ImageUpload {
 				});
 			}
 		};
+
+        if (this.options.withCredentials) {
+            xhr.withCredentials = true
+        }
 
 		xhr.send(fd);
 	}
