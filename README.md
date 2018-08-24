@@ -17,7 +17,7 @@ const quill = new Quill(editor, {
     modules: {
         // ...
         imageUpload: {
-            url: "", // server url
+            url: "", // server url. If the url is empty then the base64 returns
             method: "POST", // change query method, default 'POST' 
             headers: {}, // add custom headers, example { token: 'your-token'}
             // personalize successful callback and call next function to insert new url to the editor
@@ -53,7 +53,7 @@ var quill = new Quill(editor, {
     modules: {
         // ...
         imageUpload: {
-            url: "", // server url
+            url: "", // server url. If the url is empty then the base64 returns
             method: "POST", // change query method, default 'POST' 
             headers: {}, // add custom headers, example { token: 'your-token'}
             // personalize successful callback and call next function to insert new url to the editor
