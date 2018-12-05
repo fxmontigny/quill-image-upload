@@ -55,9 +55,10 @@ export class ImageUpload {
 	 * Send to server
 	 * @param {File} file
 	 */
-	sendToServer(file) {
+	sendToServer(file) {          
     const url = this.options.url,
         method = this.options.method || 'POST',
+        name = this.options.name || 'image',
         headers = this.options.headers || {},
         callbackOK = this.options.callbackOK || this.uploadImageCallbackOK.bind(this),
         callbackKO = this.options.callbackKO || this.uploadImageCallbackKO.bind(this);
@@ -86,6 +87,10 @@ export class ImageUpload {
           });
         }
       };
+      
+      if (this.options.withCredentials) {
+          xhr.withCredentials = true
+      }
 
       xhr.send(fd);
     } else {
