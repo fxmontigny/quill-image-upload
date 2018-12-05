@@ -4,7 +4,6 @@
  * @see https://quilljs.com/blog/building-a-custom-module/
  */
 export class ImageUpload {
-
 	/**
 	 * Instantiate the module given a quill instance and any options
 	 * @param {Quill} quill
@@ -16,9 +15,10 @@ export class ImageUpload {
 		// save options
 		this.options = options;
 		// listen for drop and paste events
-		this.quill.getModule('toolbar').addHandler('image', this.selectLocalImage.bind(this));
+		this.quill
+			.getModule('toolbar')
+			.addHandler('image', this.selectLocalImage.bind(this));
 	}
-
 
 	/**
 	 * Select local image
@@ -34,7 +34,8 @@ export class ImageUpload {
 
 			// file type is only image.
 			if (/^image\//.test(file.type)) {
-				const checkBeforeSend = this.options.checkBeforeSend || this.checkBeforeSend.bind(this);
+				const checkBeforeSend =
+					this.options.checkBeforeSend || this.checkBeforeSend.bind(this);
 				checkBeforeSend(file, this.sendToServer.bind(this));
 			} else {
 				console.warn('You could only upload images.');
@@ -56,46 +57,60 @@ export class ImageUpload {
 	 * @param {File} file
 	 */
 	sendToServer(file) {
-    const url = this.options.url,
-        method = this.options.method || 'POST',
-        headers = this.options.headers || {},
-        callbackOK = this.options.callbackOK || this.uploadImageCallbackOK.bind(this),
-        callbackKO = this.options.callbackKO || this.uploadImageCallbackKO.bind(this);
+		// Handle custom upload
+		if (this.options.customUploader) {
+			this.options.customUploader(file, dataUrl => {
+				this.insert(dataUrl);
+			});
+		} else {
+			const url = this.options.url,
+				method = this.options.method || 'POST',
+				name = this.options.name || 'image',
+				headers = this.options.headers || {},
+				callbackOK =
+					this.options.callbackOK || this.uploadImageCallbackOK.bind(this),
+				callbackKO =
+					this.options.callbackKO || this.uploadImageCallbackKO.bind(this);
 
-    if (url) {
-      const fd = new FormData();
+			if (url) {
+				const fd = new FormData();
 
-      fd.append('image', file)
-      const xhr = new XMLHttpRequest();
-      // init http query
-      xhr.open(method, url, true);
-      // add custom headers
-      for (var index in headers) {
-        xhr.setRequestHeader(index, headers[index]);
-      }
+				fd.append(name, file);
+				const xhr = new XMLHttpRequest();
+				// init http query
+				xhr.open(method, url, true);
+				// add custom headers
+				for (var index in headers) {
+					xhr.setRequestHeader(index, headers[index]);
+				}
 
-      // listen callback
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          callbackOK(JSON.parse(xhr.responseText), this.insert.bind(this));
-        } else {
-          callbackKO({
-            code: xhr.status,
-            type: xhr.statusText,
-            body: xhr.responseText
-          });
-        }
-      };
+				// listen callback
+				xhr.onload = () => {
+					if (xhr.status === 200) {
+						callbackOK(JSON.parse(xhr.responseText), this.insert.bind(this));
+					} else {
+						callbackKO({
+							code: xhr.status,
+							type: xhr.statusText,
+							body: xhr.responseText
+						});
+					}
+				};
 
-      xhr.send(fd);
-    } else {
-      const reader = new FileReader();
+				if (this.options.withCredentials) {
+					xhr.withCredentials = true;
+				}
 
-      reader.onload = (event) => {
-        callbackOK(event.target.result, this.insert.bind(this));
-      }
-      reader.readAsDataURL(file)
-    }
+				xhr.send(fd);
+			} else {
+				const reader = new FileReader();
+
+				reader.onload = event => {
+					callbackOK(event.target.result, this.insert.bind(this));
+				};
+				reader.readAsDataURL(file);
+			}
+		}
 	}
 
 	/**
@@ -103,7 +118,8 @@ export class ImageUpload {
 	 * @param {String} dataUrl  The base64-encoded image URI
 	 */
 	insert(dataUrl) {
-		const index = (this.quill.getSelection() || {}).index || this.quill.getLength();
+		const index =
+			(this.quill.getSelection() || {}).index || this.quill.getLength();
 		this.quill.insertEmbed(index, 'image', dataUrl, 'user');
 	}
 
@@ -122,6 +138,4 @@ export class ImageUpload {
 	uploadImageCallbackKO(error) {
 		alert(error);
 	}
-
-
 }
