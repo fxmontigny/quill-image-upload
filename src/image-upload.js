@@ -76,6 +76,12 @@ export class ImageUpload {
 				const fd = new FormData();
 
 				fd.append(name, file);
+
+				if (this.options.csrf) {
+					// add CSRF
+					fd.append(this.options.csrf.token, this.options.csrf.hash);
+				}
+
 				const xhr = new XMLHttpRequest();
 				// init http query
 				xhr.open(method, url, true);
