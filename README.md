@@ -17,7 +17,7 @@ const quill = new Quill(editor, {
     modules: {
         // ...
         imageUpload: {
-            url: "", // server url
+            url: "", // server url. If the url is empty then the base64 returns
             method: "POST", // change query method, default 'POST' 
             name: "image", // custom form name
             withCredentials: false, // withCredentials
@@ -55,7 +55,7 @@ var quill = new Quill(editor, {
     modules: {
         // ...
         imageUpload: {
-            url: "", // server url
+            url: "", // server url. If the url is empty then the base64 returns
             method: "POST", // change query method, default 'POST' 
             name: "image", // custom form name
             withCredentials: false, // withCredentials

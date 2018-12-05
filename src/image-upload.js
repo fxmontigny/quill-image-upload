@@ -44,8 +44,8 @@ export class ImageUpload {
 
 	/**
 	 * Check file before sending to the server
-     * @param {File} file
-     * @param {Function} next
+	 * @param {File} file
+	 * @param {Function} next
 	 */
 	checkBeforeSend(file, next) {
 		next(file);
@@ -55,42 +55,52 @@ export class ImageUpload {
 	 * Send to server
 	 * @param {File} file
 	 */
-	sendToServer(file) {
-		const url = this.options.url || 'your-url.com',
-			method = this.options.method || 'POST',
-            name = this.options.name || 'image',
-			headers = this.options.headers || {},
-			callbackOK = this.options.callbackOK || this.uploadImageCallbackOK.bind(this),
-			callbackKO = this.options.callbackKO || this.uploadImageCallbackKO.bind(this),
-			fd = new FormData();
-		fd.append(name, file);
+	sendToServer(file) {          
+    const url = this.options.url,
+        method = this.options.method || 'POST',
+        name = this.options.name || 'image',
+        headers = this.options.headers || {},
+        callbackOK = this.options.callbackOK || this.uploadImageCallbackOK.bind(this),
+        callbackKO = this.options.callbackKO || this.uploadImageCallbackKO.bind(this);
 
-		const xhr = new XMLHttpRequest();
-		// init http query
-		xhr.open(method, url, true);
-		// add custom headers
-		for (var index in headers) {
-			xhr.setRequestHeader(index, headers[index]);
-		}
+    if (url) {
+      const fd = new FormData();
 
-		// listen callback
-		xhr.onload = () => {
-			if (xhr.status === 200) {
-				callbackOK(JSON.parse(xhr.responseText), this.insert.bind(this));
-			} else {
-				callbackKO({
-					code: xhr.status,
-					type: xhr.statusText,
-					body: xhr.responseText
-				});
-			}
-		};
+      fd.append('image', file)
+      const xhr = new XMLHttpRequest();
+      // init http query
+      xhr.open(method, url, true);
+      // add custom headers
+      for (var index in headers) {
+        xhr.setRequestHeader(index, headers[index]);
+      }
 
-        if (this.options.withCredentials) {
-            xhr.withCredentials = true
+      // listen callback
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          callbackOK(JSON.parse(xhr.responseText), this.insert.bind(this));
+        } else {
+          callbackKO({
+            code: xhr.status,
+            type: xhr.statusText,
+            body: xhr.responseText
+          });
         }
+      };
+      
+      if (this.options.withCredentials) {
+          xhr.withCredentials = true
+      }
 
-		xhr.send(fd);
+      xhr.send(fd);
+    } else {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        callbackOK(event.target.result, this.insert.bind(this));
+      }
+      reader.readAsDataURL(file)
+    }
 	}
 
 	/**
@@ -98,8 +108,7 @@ export class ImageUpload {
 	 * @param {String} dataUrl  The base64-encoded image URI
 	 */
 	insert(dataUrl) {
-		const selection = this.quill.getSelection();
-    		const index = selection ? selection.index : this.quill.getLength();
+		const index = (this.quill.getSelection() || {}).index || this.quill.getLength();
 		this.quill.insertEmbed(index, 'image', dataUrl, 'user');
 	}
 
