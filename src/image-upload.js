@@ -18,6 +18,12 @@ export class ImageUpload {
 		this.quill
 			.getModule('toolbar')
 			.addHandler('image', this.selectLocalImage.bind(this));
+		// bind handlers to this instance
+		this.handleDrop = this.handleDrop.bind(this);
+		this.handlePaste = this.handlePaste.bind(this);
+		// listen for drop and paste events
+		this.quill.root.addEventListener('drop', this.handleDrop, false);
+		this.quill.root.addEventListener('paste', this.handlePaste, false);
 	}
 
 	/**
@@ -106,7 +112,6 @@ export class ImageUpload {
 				if (this.options.withCredentials) {
 					xhr.withCredentials = true;
 				}
-
 				xhr.send(fd);
 			} else {
 				const reader = new FileReader();
@@ -117,6 +122,76 @@ export class ImageUpload {
 				reader.readAsDataURL(file);
 			}
 		}
+	}
+
+	/**
+	 * Handler for drop event to read dropped files from evt.dataTransfer
+	 * @param {Event} evt
+	 */
+	handleDrop(evt) {
+		evt.preventDefault();
+		if (evt.dataTransfer && evt.dataTransfer.files && evt.dataTransfer.files.length) {
+			if (document.caretRangeFromPoint) {
+				const selection = document.getSelection();
+				const range = document.caretRangeFromPoint(evt.clientX, evt.clientY);
+				if (selection && range) {
+					selection.setBaseAndExtent(range.startContainer, range.startOffset, range.startContainer, range.startOffset);
+				}
+			}
+			// this.readFiles(evt.dataTransfer.files, this.insert.bind(this));
+			this.readFiles(evt.dataTransfer.files, this.sendToServer.bind(this));
+		}
+	}
+
+	/**
+	 * Handler for paste event to read pasted files from evt.clipboardData
+	 * @param {Event} evt
+	//  */
+	handlePaste(evt) {
+		if (evt.clipboardData && evt.clipboardData.items && evt.clipboardData.items.length) {
+			this.readFiles(evt.clipboardData.items, dataUrl => {
+				const selection = this.quill.getSelection();
+				if (selection) {
+					// we must be in a browser that supports pasting (like Firefox)
+					// so it has already been placed into the editor
+				}
+				else {
+					// otherwise we wait until after the paste when this.quill.getSelection()
+					// will return a valid index
+					// setTimeout(() => this.insert(dataUrl), 0);
+					setTimeout(() => this.sendToServer(dataUrl), 0);
+				}
+			});
+		}
+	}
+
+  /**
+	 * Extract image URIs a list of files from evt.dataTransfer or evt.clipboardData
+	 * @param {File[]} files  One or more File objects
+	 * @param {Function} callback  A function to send each data URI to
+	 */
+	readFiles(files, callback) {
+		// check each file for an image
+		[].forEach.call(files, file => {
+			if (!/^image\//.test(file.type)) {
+				// file is not an image
+				// Note that some file formats such as psd start with image/* but are not readable
+				return;
+			}
+			// set up file reader
+			const reader = new FileReader();
+			reader.onload = (evt) => {
+				const checkBeforeSend =
+					this.options.checkBeforeSend || this.checkBeforeSend.bind(this);
+				checkBeforeSend(file, callback);
+				// checkBeforeSend(evt.target.result, callback);
+			};
+			// read the clipboard item or file
+			const blob = file.getAsFile ? file.getAsFile() : file;
+			if (blob instanceof Blob) {
+				reader.readAsDataURL(blob);
+			}
+		});
 	}
 
 	/**
