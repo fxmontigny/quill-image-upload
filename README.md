@@ -2,6 +2,8 @@
 
 A module for Quill rich text editor to upload images to be selected from toolbar editor.
 
+This version support Drag&Drop by itself.
+
 ## Usage
 
 ### Webpack/ES6
