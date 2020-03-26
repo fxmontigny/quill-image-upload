@@ -10,5 +10,4 @@ js=$(node $dir/node_modules/babel-cli/bin/babel.js $dir/src/image-upload.js --pr
 echo $js > tmp.js
 # Wrap
 sed -i -e '/MINIFIED_JS/r tmp.js' -e '/MINIFIED_JS/d' $dir/image-upload.min.js
-echo -e "/* Origin: https://github.com/Platoniq/quill-image-upload */\n$(cat $dir/image-upload.min.js)" > $dir/image-upload.min.js
 rm tmp.js
